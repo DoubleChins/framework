@@ -6,6 +6,7 @@ package tracing
 import (
 	"bytes"
 	"encoding/hex"
+	"github.com/DoubleChins/framework/logging"
 	"github.com/DoubleChins/framework/util"
 	"github.com/golang/glog"
 	"github.com/google/uuid"
@@ -36,7 +37,7 @@ func (handler *TraceHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var response http.ResponseWriter
 
 	// Handle the request
-	if glog.V(3) {
+	if glog.V(logging.TraceDebug) {
 		// Log request
 		logRequest(r)
 
@@ -52,7 +53,7 @@ func (handler *TraceHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	handler.Original.ServeHTTP(response, r)
 
 	// Log response
-	if glog.V(3) {
+	if glog.V(logging.TraceDebug) {
 		logResponse(r, response.(*TraceableResponse))
 	}
 
@@ -142,14 +143,14 @@ func generateNewTraceParent() string {
 	// Generate new trace context id
 	id, err := uuid.NewUUID()
 	if err != nil {
-		glog.V(2).Infof("could not generate uuid for tracing: %v", err)
+		glog.V(logging.TraceInformation).Infof("could not generate uuid for tracing: %v", err)
 		return ""
 	}
 
 	// Hex the binary form
 	idData, err := id.MarshalBinary()
 	if err != nil {
-		glog.V(2).Infof("could not marshal uuid for tracing: %v", err)
+		glog.V(logging.TraceInformation).Infof("could not marshal uuid for tracing: %v", err)
 		return ""
 	}
 
